@@ -1,0 +1,6 @@
+version: 2
+
+models:
+  - name: stg_seed_a
+  - name: stg_seed_b
+  - name: stg_seed_c
