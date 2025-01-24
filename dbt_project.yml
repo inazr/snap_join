@@ -30,8 +30,6 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   snap_join:
     # Config indicated by + and applies to all files under models/example/
-    stg:
+    example:
       +materialized: view
-
-    core:
-      +materialized: view
+      +tags: ['snap_join_example']
