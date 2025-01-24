@@ -32,13 +32,15 @@ The snap_join macro takes 5 arguments:
 - a list of all the snapshot models you want to join
 - a list of the valid_from column from each snapshot
 - a list of the valid_to column from each snapshot
-- a list of the column from each snapshot that is used in the sql join statement between the snapshots
+- a list of the column from each snapshot that is used in the sql join statement between the source snapshots
 - a list of lists with the columns you want to select from each snapshot
 
+You can join as many snapshots as you like.
 
+The resulting snapshot will be reduced to the minimum number of records needed to represent the changes in any given column set.
 
 ### How to install the macro?:
-- add this code snipet to your packages.yml file: 
+- add this code snippet to your packages.yml file: 
 ```
 packages:
   - git: "https://github.com/inazr/snap_join"
@@ -48,7 +50,7 @@ packages:
   - dbt deps
   - dbt seed
   - dbt build -s tag:snap_join_example
-  
+
 - delete the models/example folder
 
 ### Additional Requirements?:
