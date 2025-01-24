@@ -3,15 +3,18 @@
 {% set column_list = [] %}
 {% set column_list_alias = [] %}
 {% set column_list_labels = [] %}
+{% set column_list_with_join_key = [] %}
 
 {%- for model in list_of_models -%}
     {%- for column in list_of_columns[loop.index0] -%}
         {{ column_list.append(model+"."+column) or "" }}
         {{ column_list_alias.append(model+"."+column+" AS "+model+"_"+column) or "" }}
         {{ column_list_labels.append(model+"_"+column) or "" }}
+        {{ column_list_with_join_key.append(model+"."+column) or "" }}
     {%- endfor -%}
 {% endfor -%}
 
+{{ column_list_with_join_key.append('join_key') or "" }}
 
 WITH all_distinct_valid_from AS (
     {% for model in list_of_models %}
@@ -47,9 +50,9 @@ WITH all_distinct_valid_from AS (
             valid_from_to.valid_to,
             valid_from_to.join_key,
             {{ column_list_alias | join(",\n") }},
-            CASE WHEN {{ dbt_utils.generate_surrogate_key(column_list) }} = LAG({{ dbt_utils.generate_surrogate_key(column_list) }}) OVER (PARTITION BY valid_from_to.join_key ORDER BY valid_from_to.valid_from ASC)
+            CASE WHEN {{ dbt_utils.generate_surrogate_key(column_list_with_join_key) }} = LAG({{ dbt_utils.generate_surrogate_key(column_list_with_join_key) }}) OVER (PARTITION BY valid_from_to.join_key ORDER BY valid_from_to.valid_from ASC)
                  THEN NULL
-                 ELSE {{ dbt_utils.generate_surrogate_key(column_list) }}
+                 ELSE {{ dbt_utils.generate_surrogate_key(column_list_with_join_key) }}
             END AS _surrogate_key
     FROM
             valid_from_to
@@ -86,7 +89,7 @@ FROM
 
 GROUP BY
         surrogate_to_primary_key.join_key,
-        {{ column_list_labels | join(",\n        ") }},
+        {{ column_list_labels | join(",\n") }},
         surrogate_to_primary_key._surrogate_key
 
 )
