@@ -22,15 +22,15 @@ all_distinct_valid_from AS (
 
     {% for model in list_of_models %}
 
-        SELECT
+    SELECT
             {{ model }}.{{ valid_from_columns[loop.index0] }} AS valid_from,
             {{ model }}.{{ list_of_join_keys[loop.index0] }} AS join_key
-        FROM
+    FROM
             {{ ref(model) }}
 
-        {% if not loop.last %}
-            UNION DISTINCT
-        {% endif -%}
+    {% if not loop.last %}
+        UNION DISTINCT
+    {% endif -%}
 
     {% endfor %}
 
