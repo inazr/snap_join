@@ -4,3 +4,14 @@
              ['primary_key', 'primary_key', 'primary_key_with_another_name'],
              [['dim_a', 'dim_b', 'dim_c'], ['dim_d', 'dim_e', 'dim_f'], ['dim_g', 'dim_h']]
              ) }}
+
+SELECT
+        *
+FROM
+        snap_join
+
+WHERE   1=1
+
+ORDER BY
+        snap_join.join_key ASC,
+        snap_join.valid_from DESC
