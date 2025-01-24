@@ -1,4 +1,4 @@
-{% macro snap_join(list_of_models, valid_from_columns, valid_to_columns, list_of_join_keys, list_of_columns ) %}
+{% macro snap_join(list_of_models, valid_from_columns, valid_to_columns, list_of_join_keys, list_of_columns) %}
 
 {% set column_list = [] %}
 {% set column_list_alias = [] %}
@@ -16,7 +16,10 @@
 
 {{ column_list_with_join_key.append('join_key') or "" }}
 
-WITH all_distinct_valid_from AS (
+
+WITH
+all_distinct_valid_from AS (
+
     {% for model in list_of_models %}
 
         SELECT
@@ -30,7 +33,9 @@ WITH all_distinct_valid_from AS (
         {% endif -%}
 
     {% endfor %}
+
 )
+
 ,   valid_from_to AS (
 
     SELECT
@@ -42,7 +47,6 @@ WITH all_distinct_valid_from AS (
 
 )
 
--- Adding columns & creating _surrogate_key
 ,   joining_data AS (
 
     SELECT
@@ -64,8 +68,8 @@ WITH all_distinct_valid_from AS (
        ON   valid_from_to.join_key = {{ model }}.{{ list_of_join_keys[loop.index0] }}
       AND   valid_from_to.valid_from >= {{ model }}.{{ valid_from_columns[loop.index0] }}
       AND   COALESCE(valid_from_to.valid_to, '8888-12-31') <= COALESCE({{ model }}.{{ valid_to_columns[loop.index0] }}, '9999-12-31')
-    {% endfor %}
 
+    {% endfor %}
 )
 
 ,   surrogate_to_primary_key AS (
@@ -80,17 +84,17 @@ WITH all_distinct_valid_from AS (
 
 ,   snap_join AS (
 
-SELECT
-        MIN(surrogate_to_primary_key.valid_from) AS valid_from,
-        NULLIF(MAX(COALESCE(surrogate_to_primary_key.valid_to, '9999-12-31')), '9999-12-31') AS valid_to,
-        surrogate_to_primary_key.* EXCEPT (valid_from, valid_to),
-FROM
-        surrogate_to_primary_key
+    SELECT
+            MIN(surrogate_to_primary_key.valid_from) AS valid_from,
+            NULLIF(MAX(COALESCE(surrogate_to_primary_key.valid_to, '9999-12-31')), '9999-12-31') AS valid_to,
+            surrogate_to_primary_key.* EXCEPT (valid_from, valid_to),
+    FROM
+            surrogate_to_primary_key
 
-GROUP BY
-        surrogate_to_primary_key.join_key,
-        {{ column_list_labels | join(",\n") }},
-        surrogate_to_primary_key._surrogate_key
+    GROUP BY
+            surrogate_to_primary_key.join_key,
+            {{ column_list_labels | join(",\n") }},
+            surrogate_to_primary_key._surrogate_key
 
 )
 {% endmacro %}
