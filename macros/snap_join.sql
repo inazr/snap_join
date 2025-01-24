@@ -33,7 +33,6 @@ all_distinct_valid_from AS (
     {% endif -%}
 
     {% endfor %}
-
 )
 
 ,   valid_from_to AS (
