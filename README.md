@@ -59,3 +59,5 @@ packages:
   - package: dbt-labs/dbt_utils
     version: 1.3.0
  ``` 
+
+- I have only tested the macro with bigquery. I would appreciate feedback on how it works with other databases.
