@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: core_snap__a_b
+    columns:
+      - name: _surrogate_key
+        data_tests:
+          - unique
+          - not_null
+
+  - name: core_snap__a_b_c
+    columns:
+      - name: _surrogate_key
+        data_tests:
+          - unique
+          - not_null
