@@ -9,11 +9,11 @@ This is a dbt macro that joins multiple snapshots into a single new snapshot.
 A snapshot table stores the state of an enitity abc at a specific point in time. 
 Each record in a snapshot table has a valid_from and a valid_to value.
 
-| valid_from |  valid_to   |  primary_key |  dim_a |  dim_b |  |
-| ---------- | ----------- | ------------ | ------ | ------ |  |
-| 2025-01-01 |  2025-01-02 |  abc         |  high  |  red   |  |
-| 2025-01-02 |  2025-01-04 |  abc         |  high  |  blue  |  |
-| 2025-01-04 |             |  abc         |  low   |  blue  |  |
+| valid_from |  valid_to   |  primary_key |  dim_a |  dim_b |
+| ---------- | ----------- | ------------ | ------ | ------ |
+| 2025-01-01 |  2025-01-02 |  abc         |  high  |  red   |
+| 2025-01-02 |  2025-01-04 |  abc         |  high  |  blue  |
+| 2025-01-04 |             |  abc         |  low   |  blue  |
 
 ### Features of this macro:
 
