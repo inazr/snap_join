@@ -84,8 +84,8 @@ all_distinct_valid_from AS (
 ,   snap_join AS (
 
     SELECT
-            MIN(surrogate_to_primary_key.valid_from) AS valid_from,
-            NULLIF(MAX(COALESCE(surrogate_to_primary_key.valid_to, '9999-12-31')), '9999-12-31') AS valid_to,
+            MIN(surrogate_to_primary_key.valid_from) AS dbt_valid_from,
+            NULLIF(MAX(COALESCE(surrogate_to_primary_key.valid_to, '9999-12-31')), '9999-12-31') AS dbt_valid_to,
             surrogate_to_primary_key.* EXCEPT (valid_from, valid_to),
     FROM
             surrogate_to_primary_key
