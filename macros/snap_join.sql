@@ -16,6 +16,13 @@
 
 {{ column_list_with_join_key.append('join_key') or "" }}
 
+{% if target.type == 'bigquery' %}
+    {% set exclude_except = 'EXCEPT' %}
+{% elif target.type == 'duckdb' %}
+    {% set exclude_except = 'EXCLUDE' %}
+{% else %}
+    {% set exclude_except = 'EXCEPT' %}
+{% endif %}
 
 WITH
 all_distinct_valid_from AS (
@@ -74,7 +81,7 @@ all_distinct_valid_from AS (
 ,   surrogate_to_primary_key AS (
 
     SELECT
-            joining_data.* EXCEPT(_surrogate_key),
+            joining_data.* {{ exclude_except }}(_surrogate_key),
             TO_HEX(MD5(STRING_AGG(joining_data._surrogate_key) OVER (PARTITION BY joining_data.join_key ORDER BY joining_data.valid_from ASC))) AS _surrogate_key
     FROM
             joining_data
@@ -86,7 +93,7 @@ all_distinct_valid_from AS (
     SELECT
             MIN(surrogate_to_primary_key.valid_from) AS dbt_valid_from,
             NULLIF(MAX(COALESCE(surrogate_to_primary_key.valid_to, '9999-12-31')), '9999-12-31') AS dbt_valid_to,
-            surrogate_to_primary_key.* EXCEPT (valid_from, valid_to),
+            surrogate_to_primary_key.* {{ exclude_except }}(valid_from, valid_to),
     FROM
             surrogate_to_primary_key
 
