@@ -62,7 +62,7 @@ The snap_join macro takes 5 arguments:
 ```
 packages:
   - git: "https://github.com/inazr/snap_join"
-    branch: main
+    revision: main
  ``` 
 - test it by running the following commands:
   - dbt deps
