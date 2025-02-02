@@ -16,11 +16,10 @@
 
 {{ column_list_with_join_key.append('join_key') or "" }}
 
-{% if target.type == 'bigquery' %}
-    {% set exclude_except = 'EXCEPT' %}
-{% elif target.type == 'duckdb' %}
+{% if target.type == 'duckdb' %}
     {% set exclude_except = 'EXCLUDE' %}
 {% else %}
+    {# snowflake, bigquery #}
     {% set exclude_except = 'EXCEPT' %}
 {% endif %}
 
@@ -59,7 +58,7 @@ all_distinct_valid_from AS (
             valid_from_to.valid_from,
             valid_from_to.valid_to,
             valid_from_to.join_key,
-            {{ column_list_alias | join(",\n") }},
+            {{ column_list_alias | join(",\n        ") }},
             CASE WHEN {{ dbt_utils.generate_surrogate_key(column_list_with_join_key) }} = LAG({{ dbt_utils.generate_surrogate_key(column_list_with_join_key) }}) OVER (PARTITION BY valid_from_to.join_key ORDER BY valid_from_to.valid_from ASC)
                  THEN NULL
                  ELSE {{ dbt_utils.generate_surrogate_key(column_list_with_join_key) }}
