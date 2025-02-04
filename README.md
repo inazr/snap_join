@@ -3,6 +3,8 @@ Welcome to the snap_join macro project!
 [![dbt - >=1.7.0](https://img.shields.io/static/v1?label=dbt&message=>%3D1.7.0&color=%23FF694B&logo=dbt)](https://getdbt.com)
 [![db - BigQuery](https://img.shields.io/static/v1?label=db&message=BigQuery&color=%23669DF6&logo=googlebigquery)](https://cloud.google.com/bigquery)
 [![db - duckdb](https://img.shields.io/static/v1?label=db&message=duckdb&color=%23FFF000&logo=duckdb)](https://motherduck.com)
+[![db - Snowflake](https://img.shields.io/static/v1?label=db&message=Snowflake&color=%2329B5E8&logo=Snowflake)](https://www.snowflake.com)
+
 
 ### What is this?
 
