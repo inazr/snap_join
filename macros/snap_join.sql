@@ -18,8 +18,9 @@
 
 {% if target.type == 'duckdb' %}
     {% set exclude_except = 'EXCLUDE' %}
-{% else %}
-    {# snowflake, bigquery #}
+{% elif target.type == 'snowflake' %}
+    {% set exclude_except = 'EXCLUDE' %}
+{% elif target.type == 'bigquery' %}
     {% set exclude_except = 'EXCEPT' %}
 {% endif %}
 
@@ -81,7 +82,16 @@ all_distinct_valid_from AS (
 
     SELECT
             joining_data.* {{ exclude_except }}(_surrogate_key),
+
+        {% if target.type == 'duckdb' or target.type == 'bigquery' %}
+
             TO_HEX(MD5(STRING_AGG(joining_data._surrogate_key) OVER (PARTITION BY joining_data.join_key ORDER BY joining_data.valid_from ASC))) AS _surrogate_key
+
+        {% elif target.type == 'snowflake' %}
+
+            HEX_ENCODE(MD5(ARRAY_TO_STRING(ARRAY_AGG(joining_data._surrogate_key) OVER (PARTITION BY joining_data.join_key ORDER BY joining_data.valid_from ASC), ', '))) AS _surrogate_key
+
+        {% endif %}
     FROM
             joining_data
 
