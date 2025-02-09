@@ -1,3 +1,5 @@
+{{ config(tag='snap_join_example') }}
+
 SELECT
         *
 FROM

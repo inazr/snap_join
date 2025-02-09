@@ -20,6 +20,9 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+vars:
+  snap_join:
+    snap_join_example: false
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
