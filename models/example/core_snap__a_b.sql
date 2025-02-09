@@ -1,5 +1,3 @@
-{{ config(tag='snap_join_example') }}
-
 {{ snap_join(['stg_seed_a', 'stg_seed_b'],
              ['valid_from', 'valid_from'],
              ['valid_to', 'valid_to'],

@@ -1,6 +1,9 @@
 Welcome to the snap_join macro project!
 
 [![dbt - >=1.7.0](https://img.shields.io/static/v1?label=dbt&message=>%3D1.7.0&color=%23FF694B&logo=dbt)](https://getdbt.com)
+
+tested databases:
+
 [![db - BigQuery](https://img.shields.io/static/v1?label=db&message=BigQuery&color=%23669DF6&logo=googlebigquery)](https://cloud.google.com/bigquery)
 [![db - duckdb](https://img.shields.io/static/v1?label=db&message=duckdb&color=%23FFF000&logo=duckdb)](https://motherduck.com)
 [![db - Snowflake](https://img.shields.io/static/v1?label=db&message=Snowflake&color=%2329B5E8&logo=Snowflake)](https://www.snowflake.com)
@@ -23,10 +26,11 @@ Each record in a snapshot table has a valid_from and a valid_to value.
 
 ### Features of this macro:
 
-- You can join as many source snapshots into a single output snapshot as you like.
-- There are no naming restrictions for any column. e.g. the column that represents the valid_from point in time can be named `valid_from` in one of the tables and `dbt_valid_from` in any of the other source tables.
 - The resulting snapshot will be reduced to the minimum number of records needed to represent the state of any given column set. If you join two tables the number of records in the output snapshot depends on the selected column set.
 - The column name in each source table needs to be unique. But any column name can appear in any table.
+- You can join as many source snapshots into a single output snapshot as you like.
+- There are no naming restrictions for any column. e.g. the column that represents the valid_from point in time can be named `valid_from` in one of the tables and `dbt_valid_from` in any of the other source tables.
+
 
 ### How to use the macro?:
 
@@ -36,7 +40,7 @@ This is the model code from one of the examples:
 {{ snap_join(['stg_seed_a', 'stg_seed_b','stg_seed_c'],
              ['valid_from', 'valid_from', 'dbt_valid_from'],
              ['valid_to', 'valid_to', 'dbt_valid_to'],
-             ['primary_key', 'primary_key', 'primary_key_with_another_name'],
+             ['primary_key', 'any_column', 'primary_key_with_another_name'],
              [['dim_a', 'dim_b', 'dim_c'], ['dim_d', 'dim_e', 'dim_f'], ['dim_a', 'dim_h']]
              ) }}
 
