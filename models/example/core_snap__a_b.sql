@@ -14,5 +14,5 @@ FROM
 WHERE   1=1
 
 ORDER BY
-        snap_join.join_key ASC,
+        snap_join.unique_key ASC,
         snap_join.dbt_valid_from DESC

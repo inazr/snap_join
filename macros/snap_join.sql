@@ -1,20 +1,20 @@
-{% macro snap_join(list_of_models, valid_from_columns, valid_to_columns, list_of_join_keys, list_of_columns) %}
+{% macro snap_join(list_of_models, valid_from_columns, valid_to_columns, list_of_unique_keys, list_of_columns) %}
 
 {% set column_list = [] %}
 {% set column_list_alias = [] %}
 {% set column_list_labels = [] %}
-{% set column_list_with_join_key = [] %}
+{% set column_list_with_unique_key = [] %}
 
 {%- for model in list_of_models -%}
     {%- for column in list_of_columns[loop.index0] -%}
         {{ column_list.append(model+"."+column) or "" }}
         {{ column_list_alias.append(model+"."+column+" AS "+model+"_"+column) or "" }}
         {{ column_list_labels.append(model+"_"+column) or "" }}
-        {{ column_list_with_join_key.append(model+"."+column) or "" }}
+        {{ column_list_with_unique_key.append(model+"."+column) or "" }}
     {%- endfor -%}
 {% endfor -%}
 
-{{ column_list_with_join_key.append('join_key') or "" }}
+{{ column_list_with_unique_key.append('valid_from_to.unique_key') or "" }}
 
 {% if target.type == 'duckdb' %}
     {% set exclude_except = 'EXCLUDE' %}
@@ -31,7 +31,7 @@ all_distinct_valid_from AS (
 
     SELECT
             {{ model }}.{{ valid_from_columns[loop.index0] }} AS dbt_valid_from,
-            {{ model }}.{{ list_of_join_keys[loop.index0] }} AS join_key
+            {{ model }}.{{ list_of_unique_keys[loop.index0] }} AS unique_key
     FROM
             {{ ref(model) }}
 
@@ -46,8 +46,8 @@ all_distinct_valid_from AS (
 
     SELECT
             all_distinct_valid_from.dbt_valid_from,
-            LEAD(all_distinct_valid_from.dbt_valid_from) OVER (PARTITION BY all_distinct_valid_from.join_key ORDER BY all_distinct_valid_from.dbt_valid_from ASC) AS dbt_valid_to,
-            all_distinct_valid_from.join_key
+            LEAD(all_distinct_valid_from.dbt_valid_from) OVER (PARTITION BY all_distinct_valid_from.unique_key ORDER BY all_distinct_valid_from.dbt_valid_from ASC) AS dbt_valid_to,
+            all_distinct_valid_from.unique_key
     FROM
             all_distinct_valid_from
 
@@ -58,11 +58,11 @@ all_distinct_valid_from AS (
     SELECT
             valid_from_to.dbt_valid_from,
             valid_from_to.dbt_valid_to,
-            valid_from_to.join_key,
+            valid_from_to.unique_key,
             {{ column_list_alias | join(",\n        ") }},
-            CASE WHEN {{ dbt_utils.generate_surrogate_key(column_list_with_join_key) }} = LAG({{ dbt_utils.generate_surrogate_key(column_list_with_join_key) }}) OVER (PARTITION BY valid_from_to.join_key ORDER BY valid_from_to.dbt_valid_from ASC)
+            CASE WHEN {{ dbt_utils.generate_surrogate_key(column_list_with_unique_key) }} = LAG({{ dbt_utils.generate_surrogate_key(column_list_with_unique_key) }}) OVER (PARTITION BY valid_from_to.unique_key ORDER BY valid_from_to.dbt_valid_from ASC)
                  THEN NULL
-                 ELSE {{ dbt_utils.generate_surrogate_key(column_list_with_join_key) }}
+                 ELSE {{ dbt_utils.generate_surrogate_key(column_list_with_unique_key) }}
             END AS _surrogate_key
     FROM
             valid_from_to
@@ -71,7 +71,7 @@ all_distinct_valid_from AS (
 
     LEFT JOIN
             {{ ref(model) }}
-       ON   valid_from_to.join_key = {{ model }}.{{ list_of_join_keys[loop.index0] }}
+       ON   valid_from_to.unique_key = {{ model }}.{{ list_of_unique_keys[loop.index0] }}
       AND   valid_from_to.dbt_valid_from >= {{ model }}.{{ valid_from_columns[loop.index0] }}
       AND   COALESCE(valid_from_to.dbt_valid_to, '8888-12-31') <= COALESCE({{ model }}.{{ valid_to_columns[loop.index0] }}, '9999-12-31')
 
@@ -85,11 +85,11 @@ all_distinct_valid_from AS (
 
         {% if target.type == 'duckdb' or target.type == 'bigquery' %}
 
-            TO_HEX(MD5(STRING_AGG(joining_data._surrogate_key) OVER (PARTITION BY joining_data.join_key ORDER BY joining_data.dbt_valid_from ASC))) AS _surrogate_key
+            TO_HEX(MD5(STRING_AGG(joining_data._surrogate_key) OVER (PARTITION BY joining_data.unique_key ORDER BY joining_data.dbt_valid_from ASC))) AS _surrogate_key
 
         {% elif target.type == 'snowflake' %}
 
-            HEX_ENCODE(MD5(ARRAY_TO_STRING(ARRAY_AGG(joining_data._surrogate_key) OVER (PARTITION BY joining_data.join_key ORDER BY joining_data.dbt_valid_from ASC), ', '))) AS _surrogate_key
+            HEX_ENCODE(MD5(ARRAY_TO_STRING(ARRAY_AGG(joining_data._surrogate_key) OVER (PARTITION BY joining_data.unique_key ORDER BY joining_data.dbt_valid_from ASC), ', '))) AS _surrogate_key
 
         {% endif %}
     FROM
@@ -107,7 +107,7 @@ all_distinct_valid_from AS (
             surrogate_to_primary_key
 
     GROUP BY
-            surrogate_to_primary_key.join_key,
+            surrogate_to_primary_key.unique_key,
             {{ column_list_labels | join(",\n") }},
             surrogate_to_primary_key._surrogate_key
 
