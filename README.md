@@ -37,7 +37,7 @@ Each record in a snapshot table has a valid_from and a valid_to value.
 Create a dbt model with the name you prefer for the resulting snapshot table or view.
 This is the model code from one of the examples:
 ```
-{{ snap_join(['stg_seed_a', 'stg_seed_b','stg_seed_c'],
+{{ dbt_snap_join.snap_join(['stg_seed_a', 'stg_seed_b','stg_seed_c'],
              ['valid_from', 'valid_from', 'dbt_valid_from'],
              ['valid_to', 'valid_to', 'dbt_valid_to'],
               ['unique_key', 'unique_key', 'unique_key_with_another_name'],
