@@ -18,11 +18,11 @@ This is a dbt macro that joins multiple snapshots into a single new snapshot.
 A snapshot table stores the state of an enitity abc at a specific point in time. 
 Each record in a snapshot table has a valid_from and a valid_to value.
 
-| valid_from |  valid_to   |  primary_key |  dim_a |  dim_b |
-| ---------- | ----------- | ------------ | ------ | ------ |
-| 2025-01-01 |  2025-01-02 |  abc         |  high  |  red   |
-| 2025-01-02 |  2025-01-04 |  abc         |  high  |  blue  |
-| 2025-01-04 |             |  abc         |  low   |  blue  |
+| valid_from |  valid_to   | unique_key |  dim_a |  dim_b |
+| ---------- | ----------- |------------| ------ | ------ |
+| 2025-01-01 |  2025-01-02 | abc        |  high  |  red   |
+| 2025-01-02 |  2025-01-04 | abc        |  high  |  blue  |
+| 2025-01-04 |             | abc        |  low   |  blue  |
 
 ### Features of this macro:
 
@@ -40,7 +40,7 @@ This is the model code from one of the examples:
 {{ snap_join(['stg_seed_a', 'stg_seed_b','stg_seed_c'],
              ['valid_from', 'valid_from', 'dbt_valid_from'],
              ['valid_to', 'valid_to', 'dbt_valid_to'],
-             ['primary_key', 'any_column', 'primary_key_with_another_name'],
+              ['unique_key', 'unique_key', 'unique_key_with_another_name'],
              [['dim_a', 'dim_b', 'dim_c'], ['dim_d', 'dim_e', 'dim_f'], ['dim_a', 'dim_h']]
              ) }}
 
@@ -60,7 +60,7 @@ The snap_join macro takes 5 arguments:
 - a list of all the snapshot models you want to join
 - a list of the valid_from column from each snapshot
 - a list of the valid_to column from each snapshot
-- a list of the column from each snapshot that is used in the sql join statement between the source snapshots
+- a list of the unique_key column from each snapshot
 - a list of lists with the columns you want to select from each snapshot
 
 ### How to install the macro?:

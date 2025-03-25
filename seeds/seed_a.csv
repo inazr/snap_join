@@ -1,4 +1,4 @@
-valid_from,valid_to,primary_key,dim_a,dim_b,dim_c
+valid_from,valid_to,unique_key,dim_a,dim_b,dim_c
 2024-01-01,2024-01-31,ABC,1,2,3
 2024-01-31,2024-02-28,ABC,1,2,6
 2024-02-28,2024-03-31,ABC,1,2,9

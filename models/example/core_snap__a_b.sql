@@ -1,9 +1,9 @@
-{{ snap_join(['stg_seed_a', 'stg_seed_b'],
-             ['valid_from', 'valid_from'],
-             ['valid_to', 'valid_to'],
-             ['primary_key', 'any_column'],
-             [['dim_a'], ['dim_d']]
-             ) }}
+{{ dbt_snap_join.snap_join(['stg_seed_a', 'stg_seed_b'],
+                             ['valid_from', 'valid_from'],
+                             ['valid_to', 'valid_to'],
+                             ['unique_key', 'unique_key'],
+                             [['dim_a'], ['dim_d']]
+                             ) }}
 
 
 SELECT

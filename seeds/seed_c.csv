@@ -1,4 +1,4 @@
-dbt_valid_from,dbt_valid_to,primary_key_with_another_name,dim_a,dim_h
+dbt_valid_from,dbt_valid_to,unique_key_with_another_name,dim_a,dim_h
 2024-02-27,2024-03-14,ABC,1,2
 2024-03-14,2024-03-29,ABC,,3
 2024-03-29,2024-04-13,ABC,1,1
