@@ -1,17 +1,19 @@
-Welcome to the snap_join macro project!
+## Welcome to the snap_join macro project!
+
+### What is this?
+
+This is a dbt macro that joins multiple snapshots into a single new snapshot.
+
+### Requirements:
 
 [![dbt - >=1.7.0](https://img.shields.io/static/v1?label=dbt&message=>%3D1.7.0&color=%23FF694B&logo=dbt)](https://getdbt.com)
 
-tested databases:
+#### Databases:
 
 [![db - BigQuery](https://img.shields.io/static/v1?label=db&message=BigQuery&color=%23669DF6&logo=googlebigquery)](https://cloud.google.com/bigquery)
 [![db - duckdb](https://img.shields.io/static/v1?label=db&message=duckdb&color=%23FFF000&logo=duckdb)](https://motherduck.com)
 [![db - Snowflake](https://img.shields.io/static/v1?label=db&message=Snowflake&color=%2329B5E8&logo=Snowflake)](https://www.snowflake.com)
 
-
-### What is this?
-
-This is a dbt macro that joins multiple snapshots into a single new snapshot.
 
 ### What is a snapshot?
 
@@ -20,9 +22,9 @@ Each record in a snapshot table has a valid_from and a valid_to value.
 
 | valid_from |  valid_to   | unique_key |  dim_a |  dim_b |
 | ---------- | ----------- |------------| ------ | ------ |
-| 2025-01-01 |  2025-01-02 | abc        |  high  |  red   |
-| 2025-01-02 |  2025-01-04 | abc        |  high  |  blue  |
 | 2025-01-04 |             | abc        |  low   |  blue  |
+| 2025-01-02 |  2025-01-04 | abc        |  high  |  blue  |
+| 2025-01-01 |  2025-01-02 | abc        |  high  |  red   |
 
 ### Features of this macro:
 
@@ -38,11 +40,10 @@ Create a dbt model with the name you prefer for the resulting snapshot table or 
 This is the model code from one of the examples:
 ```
 {{ dbt_snap_join.snap_join(['stg_seed_a', 'stg_seed_b','stg_seed_c'],
-             ['valid_from', 'valid_from', 'dbt_valid_from'],
-             ['valid_to', 'valid_to', 'dbt_valid_to'],
-              ['unique_key', 'unique_key', 'unique_key_with_another_name'],
-             [['dim_a', 'dim_b', 'dim_c'], ['dim_d', 'dim_e', 'dim_f'], ['dim_a', 'dim_h']]
-             ) }}
+                           ['valid_from', 'valid_from', 'dbt_valid_from'],
+                           ['valid_to', 'valid_to', 'dbt_valid_to'],
+                           ['unique_key', 'unique_key', 'unique_key_with_another_name'],
+                           [['dim_a', 'dim_b', 'dim_c'], ['dim_d', 'dim_e', 'dim_f'], ['dim_a', 'dim_h']]) }}
 
 SELECT
         *
@@ -53,7 +54,7 @@ WHERE   1=1
 
 ORDER BY
         snap_join.unique_key ASC,
-        snap_join.dbt_valid_from DESC
+        snap_join.valid_from DESC
  ``` 
 
 The snap_join macro takes 5 arguments:
@@ -68,14 +69,14 @@ The snap_join macro takes 5 arguments:
 ```
 packages:
   - git: "https://github.com/inazr/snap_join"
-    revision: v0.2.3-beta
+    revision: v0.3.0-beta
  ``` 
+
 - test it by running the following commands:
   - dbt deps
-  - dbt seed
+  - enable the seeds & models in the snap_join dbt_project.yml file
   - dbt build -s tag:snap_join_example
 
-- delete the models/example folder
 
 ### Additional Requirements?:
 ```

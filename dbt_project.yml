@@ -1,8 +1,7 @@
-
 name: 'dbt_snap_join'
 version: '1.0.0'
 
-profile: 'snap'
+profile: snap
 
 model-paths: ["models"]
 seed-paths: ["seeds"]
@@ -10,6 +9,8 @@ macro-paths: ["macros"]
 
 models:
   +tags: 'snap_join_example'
+  +enabled: false
 
 seeds:
   +tags: 'snap_join_example'
+  +enabled: false
