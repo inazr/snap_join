@@ -1,14 +1,11 @@
 ## Welcome to the snap_join macro project!
+[![dbt - >=1.7.0](https://img.shields.io/static/v1?label=dbt&message=>%3D1.7.0&color=%23FF694B&logo=dbt)](https://getdbt.com)
 
 ### What is this?
 
 This is a dbt macro that joins multiple snapshots into a single new snapshot.
 
-### Requirements:
-
-[![dbt - >=1.7.0](https://img.shields.io/static/v1?label=dbt&message=>%3D1.7.0&color=%23FF694B&logo=dbt)](https://getdbt.com)
-
-#### Databases:
+### Databases:
 
 [![db - BigQuery](https://img.shields.io/static/v1?label=db&message=BigQuery&color=%23669DF6&logo=googlebigquery)](https://cloud.google.com/bigquery)
 [![db - duckdb](https://img.shields.io/static/v1?label=db&message=duckdb&color=%23FFF000&logo=duckdb)](https://motherduck.com)
@@ -17,7 +14,7 @@ This is a dbt macro that joins multiple snapshots into a single new snapshot.
 
 ### What is a snapshot?
 
-A snapshot table stores the state of an enitity abc at a specific point in time. 
+A snapshot table stores the state of an enitity identified as "abc" at a specific point in time. 
 Each record in a snapshot table has a valid_from and a valid_to value.
 
 | valid_from |  valid_to   | unique_key |  dim_a |  dim_b |
@@ -34,7 +31,7 @@ Each record in a snapshot table has a valid_from and a valid_to value.
 - There are no naming restrictions for any column. e.g. the column that represents the valid_from point in time can be named `valid_from` in one of the tables and `dbt_valid_from` in any of the other source tables.
 
 
-### How to use the macro?:
+### How to use the macro?
 
 Create a dbt model with the name you prefer for the resulting snapshot table or view.
 This is the model code from one of the examples:
@@ -64,7 +61,7 @@ The snap_join macro takes 5 arguments:
 - a list of the unique_key column from each snapshot
 - a list of lists with the columns you want to select from each snapshot
 
-### How to install the macro?:
+### How to install the macro?
 - add this code snippet to your packages.yml file: 
 ```
 packages:
@@ -78,7 +75,7 @@ packages:
   - dbt build -s tag:snap_join_example
 
 
-### Additional Requirements?:
+### Additional Requirements?
 ```
 packages:
   - package: dbt-labs/dbt_utils
