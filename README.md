@@ -69,10 +69,10 @@ packages:
     revision: v0.3.0-beta
  ``` 
 
-- test it by running the following commands:
-  - dbt deps
+- Steps to run a test:
+  - run `dbt deps`
   - enable the seeds & models in the snap_join dbt_project.yml file
-  - dbt build -s tag:snap_join_example
+  - run `dbt build -s tag:snap_join_example`
 
 
 ### Additional Requirements?
