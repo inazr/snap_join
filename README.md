@@ -3,7 +3,7 @@
 
 ### What is this?
 
-This is a dbt macro that joins multiple snapshots into a single new snapshot.
+This is a dbt macro that joins multiple scd2 tables (or snapshots) into a single new scd2 table (or snapshot).
 
 ### Databases:
 
