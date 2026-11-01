@@ -3,21 +3,22 @@
 
 ### What is this?
 
-This is a dbt macro that joins multiple scd2 tables (or snapshots) into a single new scd2 table (or snapshot).
+This is a dbt macro that joins multiple SCD2 tables into a single new SCD2 table. It runs on dbt snapshots and on any other SCD2 table, and you can mix both in one join.
 
 ### Databases:
 
 [![db - BigQuery](https://img.shields.io/static/v1?label=db&message=BigQuery&color=%23669DF6&logo=googlebigquery)](https://cloud.google.com/bigquery)
+[![db - ClickHouse](https://img.shields.io/static/v1?label=db&message=ClickHouse&color=%23FFCC01&logo=clickhouse)](https://clickhouse.com)
+[![db - Databricks](https://img.shields.io/static/v1?label=db&message=Databricks&color=%23FF3621&logo=databricks)](https://www.databricks.com)
 [![db - duckdb](https://img.shields.io/static/v1?label=db&message=duckdb&color=%23FFF000&logo=duckdb)](https://motherduck.com)
+[![db - Redshift](https://img.shields.io/static/v1?label=db&message=Redshift&color=%238C4FFF)](https://aws.amazon.com/redshift)
 [![db - Snowflake](https://img.shields.io/static/v1?label=db&message=Snowflake&color=%2329B5E8&logo=Snowflake)](https://www.snowflake.com)
 
-Only duckdb is tested on the current macro. BigQuery, Snowflake, Redshift, Databricks and ClickHouse are written for but not yet tested.
 
+### What is an SCD2 table?
 
-### What is a snapshot?
-
-A snapshot table stores the state of an enitity identified as "abc" at a specific point in time. 
-Each record in a snapshot table has a valid_from and a valid_to value.
+An SCD2 (slowly changing dimension type 2) table stores the state of an entity identified as "abc" at a specific point in time.
+Each record has a valid_from and a valid_to value. A dbt snapshot is an SCD2 table that dbt builds for you, with the columns `dbt_valid_from` and `dbt_valid_to`.
 
 | valid_from |  valid_to   | unique_key |  dim_a |  dim_b |
 | ---------- | ----------- |------------| ------ | ------ |
