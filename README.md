@@ -69,7 +69,7 @@ The snap_join macro takes 5 arguments:
 ```
 packages:
   - git: "https://github.com/inazr/snap_join"
-    revision: v0.3.0-beta
+    revision: v0.4.0-beta
  ``` 
 
 - Steps to run a test:
