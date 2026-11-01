@@ -9,7 +9,7 @@ valid_from,valid_to,unique_key,dim_d,dim_e,dim_f
 2024-05-15,,DEF,low,2,9
 2024-01-01,2024-03-15,GHI,high,2,3
 2024-03-15,2024-06-15,GHI,high,2,6
-2024-06-15,,GHI,high,2,3dbt
+2024-06-15,,GHI,high,2,3
 2024-01-01,2024-01-15,JKL,high,1,1
 2024-01-15,2024-02-15,JKL,high,1,2
 2024-02-15,2024-03-15,JKL,high,1,1

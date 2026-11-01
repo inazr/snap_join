@@ -1,5 +1,5 @@
 ## Welcome to the snap_join macro project!
-[![dbt - >=1.7.0](https://img.shields.io/static/v1?label=dbt&message=>%3D1.7.0&color=%23FF694B&logo=dbt)](https://getdbt.com)
+[![dbt - >=1.8.0](https://img.shields.io/static/v1?label=dbt&message=>%3D1.8.0&color=%23FF694B&logo=dbt)](https://getdbt.com)
 
 ### What is this?
 
@@ -29,7 +29,7 @@ Each record has a valid_from and a valid_to value. A dbt snapshot is an SCD2 tab
 ### Features of this macro:
 
 - The resulting snapshot will be reduced to the minimum number of records needed to represent the state of any given column set. If you join two tables the number of records in the output snapshot depends on the selected column set.
-- The column name in each source table needs to be unique. But any column name can appear in any table.
+- The same column name can appear in several source tables, because each output column is named after its source model.
 - You can join as many source snapshots into a single output snapshot as you like.
 - There are no naming restrictions for any column. e.g. the column that represents the valid_from point in time can be named `valid_from` in one of the tables and `dbt_valid_from` in any of the other source tables.
 
@@ -54,7 +54,7 @@ WHERE   1=1
 
 ORDER BY
         snap_join.unique_key ASC,
-        snap_join.valid_from DESC
+        snap_join.dbt_valid_from DESC
  ``` 
 
 The snap_join macro takes 5 arguments:
@@ -64,17 +64,36 @@ The snap_join macro takes 5 arguments:
 - a list of the unique_key column from each snapshot
 - a list of lists with the columns you want to select from each snapshot
 
+The macro returns these columns:
+
+| Column           | Description                                                     |
+| ---------------- | --------------------------------------------------------------- |
+| dbt_valid_from   | Start of the period                                             |
+| dbt_valid_to     | End of the period, NULL for the current record                  |
+| unique_key       | The key shared by the source tables                             |
+| \<model>_\<column> | Each selected column, e.g. `stg_seed_a_dim_a`                   |
+| _surrogate_key   | Primary key of the output, built from unique_key and dbt_valid_from |
+
 ### How to install the macro?
 - add this code snippet to your packages.yml file: 
 ```
 packages:
   - git: "https://github.com/inazr/snap_join"
-    revision: v0.4.0-beta
+    revision: v0.4.1-beta
  ``` 
 
 - Steps to run a test:
   - run `dbt deps`
-  - enable the seeds & models in the snap_join dbt_project.yml file
+  - enable the seeds & models in your own dbt_project.yml file:
+    ```
+    models:
+      dbt_snap_join:
+        +enabled: true
+
+    seeds:
+      dbt_snap_join:
+        +enabled: true
+    ```
   - run `dbt build -s tag:snap_join_example`
 
 

@@ -1,0 +1,24 @@
+version: 2
+
+macros:
+  - name: snap_join
+    description: >
+      Joins multiple SCD2 tables or dbt snapshots that share a key into a single SCD2 timeline.
+      Renders a WITH clause that ends in a CTE named snap_join, so the calling model selects from snap_join.
+      Returns dbt_valid_from, dbt_valid_to, unique_key, one <model>_<column> per selected column, and _surrogate_key.
+    arguments:
+      - name: list_of_models
+        type: list[string]
+        description: The models to join, each referenced with ref().
+      - name: valid_from_columns
+        type: list[string]
+        description: The valid_from column of each model, in the same order as list_of_models.
+      - name: valid_to_columns
+        type: list[string]
+        description: The valid_to column of each model, in the same order as list_of_models.
+      - name: list_of_unique_keys
+        type: list[string]
+        description: The key column of each model, in the same order as list_of_models.
+      - name: list_of_columns
+        type: list[list[string]]
+        description: The columns to select from each model, in the same order as list_of_models.
