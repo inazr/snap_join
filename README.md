@@ -63,6 +63,7 @@ The snap_join macro takes 5 arguments:
 - a list of the valid_to column from each snapshot
 - a list of the unique_key column from each snapshot
 - a list of lists with the columns you want to select from each snapshot
+- optional: `incremental=true` to only process changes on later runs
 
 The macro returns these columns:
 
@@ -74,12 +75,38 @@ The macro returns these columns:
 | \<model>_\<column> | Each selected column, e.g. `stg_seed_a_dim_a`                   |
 | _surrogate_key   | Primary key of the output, built from unique_key and dbt_valid_from |
 
+### How to run the macro incrementally?
+
+Add `incremental=true` to the macro call. You don't need a `config()` block, because the macro sets the materialization, the `unique_key` and the strategy (`merge` on BigQuery, `delete+insert` on all others). To change these settings, put your `config()` block after the macro call, because a block before it gets overridden.
+```
+{{ dbt_snap_join.snap_join(['stg_seed_a', 'stg_seed_b'],
+                           ['valid_from', 'valid_from'],
+                           ['valid_to', 'valid_to'],
+                           ['unique_key', 'unique_key'],
+                           [['dim_a'], ['dim_d']],
+                           incremental=true) }}
+
+SELECT
+        *
+FROM
+        snap_join
+ ``` 
+
+On later runs, the macro only processes keys with a source date after their most recent output row. It replaces that row and adds the new ones, and older rows stay as they are.
+
+This assumes your sources only add newer data. Run `dbt run --full-refresh` periodically to pick up what an incremental run misses:
+- changes dated before a key's most recent output row, e.g. late data from a source that loads less often
+- corrections to existing source rows
+- keys removed from all sources
+
+Incremental mode has only been tested on DuckDB so far. Version 1.0.0 will follow once it has been tested on all supported databases.
+
 ### How to install the macro?
 - add this code snippet to your packages.yml file: 
 ```
 packages:
   - git: "https://github.com/inazr/snap_join"
-    revision: v0.4.1-beta
+    revision: v0.5.0-beta
  ``` 
 
 - Steps to run a test:

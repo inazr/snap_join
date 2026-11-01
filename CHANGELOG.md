@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.0-beta
+
+### Features
+- Add an optional `incremental` parameter that only processes each key from its most recent output row onwards. It assumes sources only add newer data, so run `--full-refresh` periodically
+
 ## v0.4.1-beta
 
 ### Fixes

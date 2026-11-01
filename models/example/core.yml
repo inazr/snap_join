@@ -14,3 +14,10 @@ models:
         data_tests:
           - unique
           - not_null
+
+  - name: core_snap__a_b_c_incremental
+    columns:
+      - name: _surrogate_key
+        data_tests:
+          - unique
+          - not_null

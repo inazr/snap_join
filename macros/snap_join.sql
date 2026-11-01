@@ -1,4 +1,10 @@
-{% macro snap_join(list_of_models, valid_from_columns, valid_to_columns, list_of_unique_keys, list_of_columns) %}
+{% macro snap_join(list_of_models, valid_from_columns, valid_to_columns, list_of_unique_keys, list_of_columns, incremental=false) %}
+
+{# dbt-bigquery has no delete+insert and dbt-clickhouse has no merge #}
+{% if incremental %}
+{{ config(materialized='incremental', unique_key='_surrogate_key', incremental_strategy='merge' if target.type == 'bigquery' else 'delete+insert') or "" }}
+{% endif %}
+{% set load_changes_only = incremental and is_incremental() %}
 
 {% set column_list_alias = [] %}
 {% set column_list_labels = [] %}
@@ -26,13 +32,87 @@
 {{ column_list_with_unique_key.append(is_covered) or "" }}
 
 WITH
+{% if load_changes_only %}
+_anchors AS (
+
+    SELECT
+            unique_key,
+            MAX(dbt_valid_from) AS anchor
+    FROM
+            {{ this }}
+    GROUP BY
+            unique_key
+
+),
+
+_changed_keys AS (
+
+    SELECT DISTINCT
+            source_dates.unique_key,
+            _anchors.anchor
+    FROM (
+
+        {% for model in list_of_models %}
+        SELECT
+                {{ list_of_unique_keys[loop.index0] }} AS unique_key,
+                {{ valid_from_columns[loop.index0] }} AS valid_from,
+                {{ valid_to_columns[loop.index0] }} AS valid_to
+        FROM
+                {{ ref(model) }}
+
+        {% if not loop.last %}
+        UNION ALL
+        {% endif -%}
+
+        {% endfor %}
+    ) AS source_dates
+
+    LEFT JOIN
+            _anchors
+       ON   source_dates.unique_key = _anchors.unique_key
+
+    WHERE
+            _anchors.anchor IS NULL
+       OR   source_dates.valid_from > _anchors.anchor
+       OR   source_dates.valid_to > _anchors.anchor
+
+    {% if is_clickhouse %}
+    SETTINGS join_use_nulls = 1
+    {% endif %}
+),
+
+{% endif %}
 {% for model in list_of_models %}
 {{ model }} AS (
 
+    {% if not load_changes_only %}
     SELECT
             *
     FROM
             {{ ref(model) }}
+    {% else %}
+    {# ref() can render as an aliased subquery, e.g. with --empty, so it can't take an alias directly #}
+    {# A row ending on the anchor adds no values, but it can be the only source of the anchor's boundary #}
+    SELECT
+            source_rows.*
+    FROM (
+
+        SELECT
+                *
+        FROM
+                {{ ref(model) }}
+
+    ) AS source_rows
+
+    INNER JOIN
+            _changed_keys
+       ON   source_rows.{{ list_of_unique_keys[loop.index0] }} = _changed_keys.unique_key
+
+    WHERE
+            _changed_keys.anchor IS NULL
+       OR   source_rows.{{ valid_to_columns[loop.index0] }} IS NULL
+       OR   source_rows.{{ valid_to_columns[loop.index0] }} >= _changed_keys.anchor
+    {% endif %}
 
 ),
 
@@ -71,6 +151,16 @@ all_valid_from AS (
             all_valid_from.unique_key
     FROM
             all_valid_from
+
+    {% if load_changes_only %}
+    INNER JOIN
+            _changed_keys
+       ON   all_valid_from.unique_key = _changed_keys.unique_key
+
+    WHERE
+            _changed_keys.anchor IS NULL
+       OR   all_valid_from.dbt_valid_from >= _changed_keys.anchor
+    {% endif %}
 
 )
 

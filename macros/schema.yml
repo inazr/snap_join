@@ -22,3 +22,8 @@ macros:
       - name: list_of_columns
         type: list[list[string]]
         description: The columns to select from each model, in the same order as list_of_models.
+      - name: incremental
+        type: boolean
+        description: >
+          Defaults to false. If true, the macro configures the calling model as incremental and only processes each key from its most recent output row onwards.
+          Assumes sources only add newer data. Run --full-refresh periodically to pick up late data and corrections.
