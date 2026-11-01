@@ -11,6 +11,8 @@ This is a dbt macro that joins multiple scd2 tables (or snapshots) into a single
 [![db - duckdb](https://img.shields.io/static/v1?label=db&message=duckdb&color=%23FFF000&logo=duckdb)](https://motherduck.com)
 [![db - Snowflake](https://img.shields.io/static/v1?label=db&message=Snowflake&color=%2329B5E8&logo=Snowflake)](https://www.snowflake.com)
 
+Only duckdb is tested on the current macro. BigQuery, Snowflake, Redshift, Databricks and ClickHouse are written for but not yet tested.
+
 
 ### What is a snapshot?
 
